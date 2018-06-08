@@ -4,6 +4,11 @@ import time
 import requests
 
 
+# if the script got disrupted and you want to continue with one specific user
+# enter the user name here
+continue_with_user = None
+
+
 base_url = 'https://de.wikipedia.org/w/api.php?action=query&format=json&list=allrevisions&arvprop=ids%7Cflags%7Ctimestamp%7Cuser%7Csize%7Ccontentmodel%7Ccontent%7Ccomment%7Cparsedcomment%7Ctags&arvlimit=500'
 cont = ''
 
@@ -15,9 +20,13 @@ with open('data/users.csv', newline='') as csvfile:
     for row in reader:
         users.append(row[0])
 
-skip = True
+if continue_with_user is None:
+    skip = False
+else:
+    skip = True
+
 for user in users:
-    if user == 'RatsschaenkeBornemann':
+    if skip and user == continue_with_user:
         skip = False
 
     if skip:
