@@ -14,6 +14,8 @@ For the German Wikipedia, we want to get contributions of [verified accounts](ht
 2.  Get recent changes: [get_recent_changes_per_user.py](get_recent_changes_per_user.py)
 3.  Get all revisions: [get_revisions_per_user.py](get_revisions_per_user.py)
 
+We will have two CSV files for each user. One contains the recent changes and one contains the revisions.
+
 ## License
 
 MIT.
