@@ -1,6 +1,11 @@
 import csv
+import pathlib
 
 import requests
+
+# create folders for later use
+pathlib.Path('data/recent_changes').mkdir(parents=True, exist_ok=True) 
+pathlib.Path('data/allrevisions').mkdir(parents=True, exist_ok=True) 
 
 base_url = 'https://de.wikipedia.org/w/api.php?action=query&format=json&list=categorymembers&cmtitle=Kategorie%3ABenutzer%3AVerifiziert&cmlimit=500'
 cont = ''

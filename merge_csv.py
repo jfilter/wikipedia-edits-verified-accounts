@@ -1,29 +1,21 @@
-import os
 import csv
-import sys
+from pathlib import Path
 
-# merging the individual csv to one huge csv
-# TODO: should use ordinary csv reader/writer instead of dict reader/writer
+folder = 'recent_changes'
 
-path = 'data/allrevisions'
-files = os.listdir(path)
+all_csv = [pth for pth in Path(folder).iterdir()
+            if pth.suffix == '.csv']
 
-csv.field_size_limit(sys.maxsize)
+header = None
+rows = []
 
-fieldnames = ['page_id', 'page_title', 'revid', 'parentid', 'user', 'timestamp',
-              'comment', 'parsedcomment', 'contentformat', 'contentmodel', 'size', 'tags', 'bot', 'new', 'minor', 'data', 'texthidden', 'suppressed', 'commenthidden']
+for f_csv in all_csv:
+    with open(f_csv) as csvfile:
+        reader = csv.reader(csvfile)
+        header = next(reader) # read header
+        rows += list(reader)
 
-data = []
-
-for f in files[:10]:
-    with open(f'{path}/{f}', 'r', newline='') as csvfile:
-
-        reader = csv.DictReader(csvfile, fieldnames=fieldnames)
-        data += list(reader)
-        print(len(data))
-
-with open('data/allrevisions_all.csv', 'w', newline='') as csvfile:
-    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-    writer.writeheader()
-    writer.writerows(data)
-    print('wrote file')
+with open(f'{folder}_all.csv', 'w') as csvfile:
+    writer = csv.writer(csvfile)
+    writer.writerow(header)
+    writer.writerows(rows)

@@ -16,7 +16,7 @@ with open('data/users.csv', newline='') as csvfile:
 
 for user in users:
     print(user)
-    user_base_url = base_url + '&rcuser=' + user
+    user_base_url = base_url + '&rcuser=' + requests.utils.quote(user)
     recent_changes = []
     cont = None
 

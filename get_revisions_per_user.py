@@ -6,7 +6,7 @@ import requests
 
 # if the script got disrupted and you want to continue with one specific user
 # enter the user name here
-continue_with_user = None
+continue_with_user = 'KStV_Wiking'
 
 
 base_url = 'https://de.wikipedia.org/w/api.php?action=query&format=json&list=allrevisions&arvprop=ids%7Cflags%7Ctimestamp%7Cuser%7Csize%7Ccontentmodel%7Ccontent%7Ccomment%7Cparsedcomment%7Ctags&arvlimit=500'
@@ -20,10 +20,7 @@ with open('data/users.csv', newline='') as csvfile:
     for row in reader:
         users.append(row[0])
 
-if continue_with_user is None:
-    skip = False
-else:
-    skip = True
+skip = not continue_with_user is None
 
 for user in users:
     if skip and user == continue_with_user:
@@ -33,7 +30,7 @@ for user in users:
         continue
 
     print(user)
-    user_base_url = base_url + '&arvuser=' + user
+    user_base_url = base_url + '&arvuser=' + requests.utils.quote(user)
     all_rev = []
     cont = None
 
@@ -52,7 +49,7 @@ for user in users:
             if r.ok:
                 break
             num_fails += 1
-            time.sleep(1)
+            time.sleep(num_fails * 10)
         r.raise_for_status()
         r_json = r.json()
 
@@ -75,9 +72,11 @@ for user in users:
             cont = r_json["continue"]["arvcontinue"]
 
     with open(f'data/allrevisions/{user}.csv', 'w', newline='') as csvfile:
-        fieldnames = ['page_id', 'page_title', 'revid', 'parentid', 'user', 'timestamp',
+        fieldnames = ['url','page_id', 'page_title', 'revid', 'parentid', 'user', 'timestamp',
                       'comment', 'parsedcomment', 'contentformat', 'contentmodel', 'size', 'tags', 'bot', 'new', 'minor', 'data', 'texthidden', 'suppressed', 'commenthidden']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
+        for rv in all_rev:
+            rv['url'] = f"https://de.wikipedia.org/w/index.php?title={requests.utils.quote(rv['page_title'])}&diff=prev&oldid={rv['revid']}"
         writer.writerows(all_rev)
         print('wrote file')
